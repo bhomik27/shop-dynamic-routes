@@ -1,5 +1,19 @@
 const Product = require('../models/product');
 
+
+exports.getProducts = (req, res, next) => {
+  Product.fetchAll()
+    .then(([rows, fieldData]) => {
+      res.render('admin/products', {
+        prods: rows,
+        pageTitle: 'Admin Products',
+        path: '/admin/products'
+      });
+    })
+    .catch(err => console.log(err));
+};
+
+
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
@@ -50,23 +64,21 @@ exports.postEditProduct = (req, res, next) => {
     updatedDescription,
     updatedPrice
   );
-  updatedProduct.save();
-  res.redirect('/admin/products');
+  updatedProduct.save()
+    .then(() => {
+      res.redirect('/admin/products');
+    })
+    .catch(err => console.log(err));
 };
 
-
-exports.getProducts = (req, res, next) => {
-  Product.fetchAll(products => {
-    res.render('admin/products', {
-      prods: products,
-      pageTitle: 'Admin Products',
-      path: '/admin/products'
-    });
-  });
-};
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteById(prodId);
-  res.redirect('/admin/products')
-}
+  Product.deleteById(prodId)
+    .then(() => {
+      res.redirect('/admin/products');
+    })
+    .catch(err => console.log(err));
+};
+
+
